@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
 
 /**
@@ -26,32 +28,32 @@ class UsersController extends Controller
      *     tags={"Users"},
      *     @OA\RequestBody(
      *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
+     *             mediaType="application/json",
      *             @OA\Schema(
      *                 required={"first_name", "last_name", "email", "role"},
      *                 @OA\Property(
      *                     property="first_name",
      *                     type="string",
      *                     description="First name",
-     *                     default="",
+     *                     default="John",
      *                 ),
      *                 @OA\Property(
      *                     property="last_name",
      *                     type="string",
      *                     description="Last name",
-     *                     default="",
+     *                     default="Doe",
      *                 ),
      *                 @OA\Property(
      *                     property="email",
      *                     type="string",
      *                     description="Email",
-     *                     default="",
+     *                     default="john.doe@example.com",
      *                 ),
      *                 @OA\Property(
      *                     property="role",
      *                     type="string",
      *                     description="Role (Please specify whether you are a student, teacher, parent, or private tutor)",
-     *                     default="",
+     *                     default="student",
      *                 ),
      *             ),
      *         ),
@@ -62,6 +64,17 @@ class UsersController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
+            'email' => 'required|email|max:255',
+            'role' => 'required|max:255|in:student,teacher,parent,private tutor',
+        ]);
+
+        if ($validator->fails()) {
+            return new JsonResponse($validator->errors(), 422);
+        }
+
         return response()->json(['status' => 'Success']);
     }
 }
