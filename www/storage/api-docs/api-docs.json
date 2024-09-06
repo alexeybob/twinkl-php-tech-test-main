@@ -1,0 +1,32 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My twinkl-php-tech-test-main API",
+        "version": "0.1"
+    },
+    "paths": {
+        "/api/user/store": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Store a new user",
+                "operationId": "6f01931881ca1429cecfd4951e6dfcba",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Users"
+        }
+    ]
+}
