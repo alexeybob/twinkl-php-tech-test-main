@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\WelcomeEmailNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
 
 /**
@@ -74,7 +73,10 @@ class UsersController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse($validator->errors(), 422);
+            return new JsonResponse([
+                "status" => "Failed",
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         [
@@ -92,6 +94,8 @@ class UsersController extends Controller
         $user->role = $role;
         $user->password = 'password';
         $user->push();
+
+        $user->notify(new WelcomeEmailNotification());
 
         return response()->json(["status" => "Success"]);
     }
