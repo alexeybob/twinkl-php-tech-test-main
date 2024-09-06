@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
@@ -65,16 +66,33 @@ class UsersController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|max:255',
-            'last_name' => 'required|max:255',
-            'email' => 'required|email|max:255',
-            'role' => 'required|max:255|in:student,teacher,parent,private tutor',
+            "first_name" => "required|max:255",
+            "last_name" => "required|max:255",
+            "email" => "required|email|unique:users|max:255",
+            "role" =>
+                "required|max:255|in:student,teacher,parent,private tutor",
         ]);
 
         if ($validator->fails()) {
             return new JsonResponse($validator->errors(), 422);
         }
 
-        return response()->json(['status' => 'Success']);
+        [
+            "first_name" => $firstName,
+            "last_name" => $lastName,
+            "email" => $email,
+            "role" => $role,
+        ] = $validator->getData();
+
+        $user = new User();
+        $user->name = "$firstName $lastName";
+        $user->first_name = $firstName;
+        $user->last_name = $lastName;
+        $user->email = $email;
+        $user->role = $role;
+        $user->password = 'password';
+        $user->push();
+
+        return response()->json(["status" => "Success"]);
     }
 }
